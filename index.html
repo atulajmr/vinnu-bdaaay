@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Vinnu</title>
+    <!-- Romantic Dark Gothic & Handwriting Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Reenie+Beanie&family=Special+Elite&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-black: #050406;
+            --paper-bg: #0f0d11;
+            --text-color: #e3d5dd;
+            --crimson: #8b0000;
+            --crimson-bright: #b81424;
+            --muted-text: #8c7b86;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-black);
+            color: var(--text-color);
+            font-family: 'Cinzel', serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 15px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Canvas for Red Particles Explosion */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Full Background GIF Layer - OPACITY INCREASED HERE */
+        .gif-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .gif-background img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.55; /* Increased from 0.22 */
+            filter: contrast(120%) brightness(70%);
+        }
+
+        /* Dark Radial Vignette Layer */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, rgba(12, 10, 15, 0.2) 0%, rgba(3, 2, 4, 0.85) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Paper Note Container with Dark Aesthetic */
+        .paper-note {
+            width: 100%;
+            max-width: 580px;
+            background: rgba(15, 13, 17, 0.92); /* Slightly translucent paper background */
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 26px 26px;
+            border: 1px solid rgba(139, 0, 0, 0.5);
+            border-radius: 4px;
+            box-shadow: 
+                0 20px 50px rgba(0, 0, 0, 0.95),
+                0 0 40px rgba(139, 0, 0, 0.25),
+                inset 0 0 60px rgba(0, 0, 0, 0.85);
+            padding: 50px 35px 40px 35px;
+            position: relative;
+            z-index: 10;
+            backdrop-filter: blur(8px);
+            transform: rotate(-0.5deg);
+        }
+
+        /* Tape Accent on top of note */
+        .paper-note::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 110px;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.09);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(3px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+        }
+
+        /* Scrapbook Outer Floating Stickers */
+        .gothic-sticker {
+            position: absolute;
+            pointer-events: none;
+            z-index: 5;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.85)) contrast(110%);
+            transition: transform 0.3s ease;
+        }
+
+        .sticker-top-left {
+            top: -28px;
+            left: -25px;
+            width: 75px;
+            transform: rotate(-18deg);
+        }
+
+        .sticker-top-right {
+            top: -20px;
+            right: -20px;
+            width: 70px;
+            transform: rotate(15deg);
+        }
+
+        .sticker-bottom-left {
+            bottom: -30px;
+            left: -30px;
+            width: 80px;
+            transform: rotate(-15deg);
+        }
+
+        .sticker-bottom-right {
+            bottom: -22px;
+            right: -25px;
+            width: 95px;
+            transform: rotate(12deg);
+        }
+
+        /* Scrapbook Photo Frame Stickers around sides */
+        .scrapbook-sticker-frame {
+            position: absolute;
+            background: #08060a;
+            padding: 4px;
+            border: 1px solid rgba(139, 0, 0, 0.4);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.9);
+            z-index: 5;
+            pointer-events: none;
+            width: 85px;
+            height: 85px;
+        }
+
+        .scrapbook-sticker-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(90%) contrast(110%);
+        }
+
+        .scrap-left-mid {
+            top: 40%;
+            left: -42px;
+            transform: rotate(-8deg);
+        }
+
+        .scrap-right-mid {
+            top: 45%;
+            right: -42px;
+            transform: rotate(10deg);
+        }
+
+        /* Interactive Content Container */
+        .content-wrap {
+            position: relative;
+            z-index: 20;
+        }
+
+        /* Screen 1 Layout */
+        .question-title {
+            font-size: 1.4rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-color);
+            text-align: center;
+            margin-bottom: 6px;
+            font-weight: 400;
+        }
+
+        .question-sub {
+            font-family: 'Cinzel', serif;
+            font-style: italic;
+            font-size: 0.85rem;
+            color: var(--muted-text);
+            text-align: center;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #d8c7d1;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            margin-top: 15px;
+            position: relative;
+            min-height: 50px;
+            z-index: 30;
+        }
+
+        .btn {
+            background: rgba(5, 4, 6, 0.6);
+            color: var(--text-color);
+            border: 1px solid rgba(227, 213, 221, 0.3);
+            padding: 10px 30px;
+            font-size: 0.85rem;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+            border-radius: 2px;
+            position: relative;
+            z-index: 35;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            border-color: var(--crimson-bright);
+            color: #fff;
+            background: rgba(139, 0, 0, 0.4);
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.5);
+        }
+
+        #noBtn {
+            position: relative;
+            transition: transform 0.2s ease-out;
+        }
+
+        /* Angry Reaction Container ("No" Clicked) */
+        #reactionContainer {
+            display: none;
+            margin-top: 30px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .reaction-frame {
+            display: inline-block;
+            padding: 6px;
+            background: #070608;
+            border: 1px solid rgba(139, 0, 0, 0.5);
+            box-shadow: 0 5px 20px rgba(139, 0, 0, 0.3);
+            transform: rotate(-1deg);
+        }
+
+        .reaction-frame img {
+            width: 170px;
+            height: 170px;
+            object-fit: cover;
+            display: block;
+            filter: grayscale(15%) contrast(115%);
+        }
+
+        .reaction-warning-text {
+            font-family: 'Special Elite', monospace;
+            font-size: 1rem;
+            color: var(--crimson-bright);
+            margin-top: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Screen 2 Layout */
+        #screen2 {
+            display: none;
+            animation: fadeIn 1.2s ease forwards;
+        }
+
+        .note-header {
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #f2e8ef;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .note-body {
+            font-family: 'Reenie Beanie', cursive;
+            font-size: 1.75rem;
+            line-height: 1.7;
+            color: #eddbe5;
+            white-space: pre-line;
+            text-align: left;
+            padding: 10px 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .note-footer {
+            margin-top: 25px;
+            text-align: right;
+            font-size: 0.85rem;
+            letter-spacing: 2.5px;
+            color: var(--muted-text);
+            text-transform: uppercase;
+        }
+
+        .link-btn-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .click-me-btn {
+            background: rgba(139, 0, 0, 0.35);
+            color: var(--text-color);
+            border: 1px solid var(--crimson-bright);
+            padding: 12px 35px;
+            font-size: 0.9rem;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(139, 0, 0, 0.3);
+            border-radius: 2px;
+        }
+
+        .click-me-btn:hover {
+            background: var(--crimson-bright);
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(184, 20, 36, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .line-divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(139, 0, 0, 0.5), transparent);
+            margin: 20px 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .paper-note { padding: 40px 20px; }
+            .note-body { font-size: 1.5rem; line-height: 1.6; }
+            .question-title { font-size: 1.2rem; }
+            .sticker-top-left { width: 55px; top: -18px; left: -15px; }
+            .sticker-bottom-right { width: 65px; bottom: -15px; right: -15px; }
+            .sticker-bottom-left { width: 60px; bottom: -20px; left: -20px; }
+            .scrapbook-sticker-frame { width: 65px; height: 65px; }
+            .scrap-left-mid { left: -20px; }
+            .scrap-right-mid { right: -20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Particle Explosion Canvas -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Low Opacity Background GIF -->
+    <div class="gif-background">
+        <img src="0bed7387d58407b7099d11bd3fd36246.gif" alt="background gif">
+    </div>
+
+    <!-- Dark Vignette Overlay -->
+    <div class="overlay"></div>
+
+    <!-- Paper Note Container -->
+    <div class="paper-note">
+
+        <!-- Outer Decorative Stickers -->
+        <img src="aeb067b15a7d0614163347245fb1f0e6.gif" class="gothic-sticker sticker-top-left" alt="Sticker Top Left">
+        <img src="3414f11f44e05aa907dcb7bf2498b192.gif" class="gothic-sticker sticker-top-right" alt="Sticker Top Right">
+        <img src="4ed0756485cafd290d831b3a620dd796.gif" class="gothic-sticker sticker-bottom-left" alt="Sticker Bottom Left">
+        <img src="08900aed8dde1a9fafa58dd8043f1557.gif" class="gothic-sticker sticker-bottom-right" alt="Sticker Bottom Right">
+
+        <!-- Side Scrapbook Photo Mini-Frames -->
+        <div class="scrapbook-sticker-frame scrap-left-mid">
+            <img src="1b05fa497e7710457fd6bb2fd74f9782.gif" alt="Scrapbook Sticker GIF">
+        </div>
+
+        <div class="scrapbook-sticker-frame scrap-right-mid">
+            <img src="4ed0756485cafd290d831b3a620dd796.gif" alt="Scrapbook Sticker GIF">
+        </div>
+
+        <div class="content-wrap">
+            <!-- SCREEN 1: QUESTION -->
+            <div id="screen1">
+                <h1 class="question-title">A Question For You</h1>
+                <p class="question-sub">before you read the note</p>
+                
+                <div class="line-divider"></div>
+
+                <p class="question-text">Do you love me?</p>
+
+                <div class="btn-container">
+                    <button class="btn" id="yesBtn">Yes</button>
+                    <button class="btn" id="noBtn">No</button>
+                </div>
+
+                <div id="reactionContainer">
+                    <div class="reaction-frame">
+                        <img src="b51595de229aaa7712279a7653c307f0.jpg" alt="Reaction Photo">
+                    </div>
+                    <p class="reaction-warning-text">KATTI &gt;: (</p>
+                </div>
+            </div>
+
+            <!-- SCREEN 2: NOTE CARD -->
+            <div id="screen2">
+                <h1 class="note-header">Happy Birthday Vinnu</h1>
+                
+                <div class="line-divider"></div>
+
+                <div class="note-body">
+Happy birthday meri jaanu i love you so much to the moon and back tu mera pura zindagi hai u give me so much stress and tu bohot irritate karta hai par tu meri jaan hi rahega kuch bhi hojaye 
+
+Mela kuchupuchu kaju katli i love you so so much :( i wish i was rich so i could give u everything par mai gareeb hoon, gareeb hoon paisa se par dil se tere liye mai bohotttt amir hoon dil se
+
+I miss u so much i wish ki mai nagaon me rehta ya aap mere saath tha 
+
+I’ll gift u lots of things ek din jab time aayega
+
+I know i make u angry sometimes im sorry but i love you the most Vinnu jo bhi mai bolta ya mai bohot rota you also know it’s only because Mai apse itni pyaar karti hoon baby
+
+Jo bhi ho mereko bus tera accha ke liye bhagwaan se puchta hai I want u to have the best things in life and I love you the most more than anything and anyone
+                </div>
+
+                <div class="line-divider"></div>
+                <div class="note-footer">Forever yours</div>
+
+                <!-- BUTTON LINK TO YOUTUBE -->
+                <div class="link-btn-container">
+                    <a href="https://youtu.be/ZZrM0H_OXSQ?si=A0Y8ydi6xA6qGtCp" target="_blank" class="click-me-btn">CLICK ME</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const reactionContainer = document.getElementById('reactionContainer');
+        const screen1 = document.getElementById('screen1');
+        const screen2 = document.getElementById('screen2');
+
+        // Handle "No" Button Click
+        noBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            reactionContainer.style.display = 'block';
+        });
+
+        // Runaway behavior for "No" button on desktop hover
+        noBtn.addEventListener('mouseover', function() {
+            const x = (Math.random() - 0.5) * 140;
+            const y = (Math.random() - 0.5) * 60;
+            noBtn.style.transform = `translate(${x}px, ${y}px)`;
+        });
+
+        // Handle "Yes" Button Click & Red Particle Explosion
+        yesBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            screen1.style.display = 'none';
+            screen2.style.display = 'block';
+            triggerRedParticles();
+        });
+
+        // Canvas Red Particles Animation System
+        function triggerRedParticles() {
+            const canvas = document.getElementById('particleCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const particleCount = 120;
+            const colors = ['#8b0000', '#b81424', '#ff2a4b', '#4a000b', '#e3d5dd'];
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: (Math.random() - 0.6) * 14,
+                    size: Math.random() * 6 + 2,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    alpha: 1,
+                    decay: Math.random() * 0.015 + 0.008,
+                    gravity: 0.15,
+                    rotation: Math.random() * Math.PI * 2,
+                    rotSpeed: (Math.random() - 0.5) * 0.2
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let activeParticles = 0;
+
+                particles.forEach(p => {
+                    if (p.alpha > 0) {
+                        activeParticles++;
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += p.gravity;
+                        p.alpha -= p.decay;
+                        p.rotation += p.rotSpeed;
+
+                        ctx.save();
+                        ctx.globalAlpha = Math.max(0, p.alpha);
+                        ctx.fillStyle = p.color;
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.rotation);
+                        
+                        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                        ctx.restore();
+                    }
+                });
+
+                if (activeParticles > 0) {
+                    requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            animate();
+        }
+
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('particleCanvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html> 
